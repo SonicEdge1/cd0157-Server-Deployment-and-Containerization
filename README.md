@@ -24,8 +24,40 @@ The app relies on a secret set as the environment variable `JWT_SECRET` to produ
  - AWS Account
      - You can create an AWS account by signing up [here](https://aws.amazon.com/#).
      
+
+#### Virtual Environment
+
+We recommend working within a virtual environment whenever using Python for projects. This keeps your dependencies for each project separate and organized. Instructions for setting up a virtual environment for your platform can be found in the [python docs](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/)
+
+#### PIP Dependencies
+
+Once you have your virtual environment setup and running, install dependencies by naviging to the `/backend` directory and running:
+
+```bash
+pip install -r requirements.txt
+```
+
 ## Project Steps
 
+$ export LOG_LEVEL=DEBUG
+$ echo $LOG_LEVEL
+$ export JWT_SECRET='myjwtsecret'
+// set log level to INFO for production
+
+export TOKEN=`curl --data '{"email":"abc@xyz.com","password":"mypwd"}' --header "Content-Type: application/json" -X POST localhost:8080/auth  | jq -r '.token'`
+
+curl --request GET 'http://localhost:8080/contents' -H "Authorization: Bearer ${TOKEN}" | jq .
+
+# Testing Locally
+Calls the endpoint 'localhost:80/auth' with the email/password as the message body. 
+The return JWT token assigned to the environment variable 'TOKEN' 
+$ export TOKEN=`curl --data '{"email":"abc@xyz.com","password":"WindowsPwd"}' --header "Content-Type: application/json" -X POST localhost:80/auth  | jq -r '.token'`
+$ echo $TOKEN
+Decrypt the token and returns its content
+$ curl --request GET 'http://localhost:80/contents' -H "Authorization: Bearer ${TOKEN}" | jq .
+
+To inspect the files in the container:
+$ docker exec -it <container id> bash
 Completing the project involves several steps:
 
 1. Write a Dockerfile for a simple Flask API
