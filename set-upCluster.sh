@@ -51,6 +51,10 @@ aws ssm put-parameter --name JWT_SECRET --overwrite --value "YourJWTSecret" --ty
 # To delete secret:
 # aws ssm delete-parameter --name JWT_SECRET
 
+#to check to see if parameters saved:  don't forget to use profile or region flags if necessary
+aws ssm describe-parameters \
+    --parameter-filters "Key=Name,Values=MyParameterName"
+
 # returns the external IP for the service
 kubectl get services simple-jwt-api -o wide
 
