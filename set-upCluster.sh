@@ -1,12 +1,15 @@
 #!/bin/bash
 
 # amazon cli command to set up an EKS cluster nodegroup containing two m5.large nodes.
+#if multiple profiles are set up, don't forget to use the --profile <profile name> tag
 eksctl create cluster --name simple-jwt-api --region=us-west-1
 kubectl get nodes
 
 #to delete the cluster
 # eksctl delete cluster simple-jwt-api  --region=us-west-1
 
+# create role if necessary
+aws iam create-role --role-name UdacityFlaskDeployCBKubectlRole --assume-role-policy-document file://trust.json --output text --query 'Role.Arn'
 # Attach the iam-role-policy.json policy to the 'UdacityFlaskDeployCBKubectlRole'
 aws iam put-role-policy --role-name UdacityFlaskDeployCBKubectlRole --policy-name eks-describe --policy-document file://iam-role-policy.json
 
@@ -20,7 +23,7 @@ kubectl get -n kube-system configmap/aws-auth -o yaml > /tmp/aws-auth-patch.yml
 #    - system:masters
 #    rolearn: arn:aws:iam::<ACCOUNT_ID>:role/UdacityFlaskDeployCBKubectlRole
 #    username: build 
-code /System/Volumes/Data/private/tmp/aws-auth-patch.yml
+code /tmp/aws-auth-patch.yml
 
 # Update the cluster's configmap
 kubectl patch configmap/aws-auth -n kube-system --patch "$(cat /tmp/aws-auth-patch.yml)"
