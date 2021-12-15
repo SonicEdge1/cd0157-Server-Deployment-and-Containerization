@@ -46,6 +46,21 @@ kubectl patch configmap/aws-auth -n kube-system --patch "$(cat /tmp/aws-auth-pat
 #     JWT_SECRET: JWT_SECRET
 # put secret into AWS Parameter Store
 aws ssm put-parameter --name JWT_SECRET --overwrite --value "YourJWTSecret" --type SecureString
+# **note that your secret needs to be created in the same region as your stack!  had to add --region us-west-1 to command
 
 # To delete secret:
 # aws ssm delete-parameter --name JWT_SECRET
+
+# returns the external IP for the service
+kubectl get services simple-jwt-api -o wide
+
+# code to test the app, using the returned IP
+curl --request GET '<EXTERNAL-IP URL>'
+export TOKEN=`curl -d '{"email":"<EMAIL>","password":"<PASSWORD>"}' -H "Content-Type: application/json" -X POST <EXTERNAL-IP URL>/auth  | jq -r '.token'`
+curl --request GET '<EXTERNAL-IP URL>/contents' -H "Authorization: Bearer ${TOKEN}" | jq 
+
+# add code to buildspec.yml in pre-build to run the tests before deployment
+# pre_build:
+#   commands:
+#     - pip3 install -r requirements.txt 
+#     - python -m pytest test_main.py
